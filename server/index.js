@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import routes from './routes/index.js';
+import scheduler from './services/scheduler.js';
 
 dotenv.config();
 const app = express();
@@ -14,6 +16,10 @@ app.get('/', (req, res) => {
   res.send('Hello, Express!');
 });
 
+app.use('/', routes);
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
+
+  scheduler.start();
 });
