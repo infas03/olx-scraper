@@ -1,6 +1,7 @@
 import Listing from '../models/Listing.js';
 import { hashString } from '../utils/helper.js';
 import scrapeOLX from '../scraper/olxScraper.js';
+import { notifyClients } from './websocket.js';
 
 const SCRAPE_INTERVAL_MINUTES = 10;
 let scrapeInterval = null;
@@ -16,28 +17,49 @@ async function runScrape() {
   isScraping = true;
   scrapeCount++;
   const startTime = Date.now();
+  let newListingsCount = 0;
 
   try {
     console.log(`Starting OLX scrape #${scrapeCount}...`);
+    notifyClients('scrape-status', { status: 'started', scrapeCount });
     
     await scrapeOLX(3, async (newListings) => {
+      const savedListings = [];
+
       for (const listing of newListings) {
         const listingId = hashString(listing.link);
         const exists = await Listing.findOne({ where: { id: listingId } });
         
         if (!exists) {
-          await Listing.create({
+          const created = await Listing.create({
             id: listingId,
             ...listing,
             createdAt: new Date()
           });
+          savedListings.push(created);
         }
+      }
+
+      if (savedListings.length > 0) {
+        newListingsCount += savedListings.length;
+        notifyClients('new-listings', true);
       }
     });
 
     console.log(`Scrape #${scrapeCount} complete.`);
+    notifyClients('scrape-status', { 
+      status: 'completed', 
+      scrapeCount,
+      newListingsCount,
+      duration: ((Date.now() - startTime) / 1000).toFixed(2) 
+    });
   } catch (error) {
     console.error(`Scrape #${scrapeCount} failed:`, error);
+    notifyClients('scrape-status', { 
+      status: 'failed', 
+      scrapeCount,
+      error: error.message 
+    });
   } finally {
     isScraping = false;
     console.log(`Scrape #${scrapeCount} took ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
@@ -63,6 +85,7 @@ export function stopScheduler() {
   if (scrapeInterval) {
     clearInterval(scrapeInterval);
     scrapeInterval = null;
+    notifyClients('scrape-status', { status: 'stopped' });
     console.log('Scheduler stopped');
   }
 }

@@ -9,7 +9,7 @@ export const getAllListings = async (req, res) => {
     const totalCount = await Listing.count();
 
     const listings = await Listing.findAll({
-      order: [['createdAt', 'ASC']],
+      order: [['createdAt', 'DESC']],
       limit,
       offset
     });

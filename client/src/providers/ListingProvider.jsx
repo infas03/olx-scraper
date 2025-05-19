@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ListingsContext from "../context/ListingContext";
+import { useCallback } from "react";
 
 export function ListingsProvider({ children }) {
   const [listings, setListings] = useState([]);
@@ -10,7 +11,7 @@ export function ListingsProvider({ children }) {
     total: 0,
   });
 
-  useEffect(() => {
+  const fetchListings = useCallback(() => {
     fetch(`/api/listings?page=${pagination.page}&limit=${pagination.limit}`)
       .then((res) => res.json())
       .then((data) => {
@@ -22,6 +23,10 @@ export function ListingsProvider({ children }) {
       });
   }, [pagination.page, pagination.limit]);
 
+  useEffect(() => {
+    fetchListings();
+  }, [fetchListings]);
+
   return (
     <ListingsContext.Provider
       value={{
@@ -30,6 +35,7 @@ export function ListingsProvider({ children }) {
         setFilter,
         pagination,
         setPagination,
+        refreshListings: fetchListings,
       }}
     >
       {children}
