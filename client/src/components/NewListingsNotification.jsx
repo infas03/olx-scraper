@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useCallback } from "react";
-import { SocketContext } from "../context/SocketContext";
 import ListingsContext from "../context/ListingContext";
+import SocketContext from "../context/SocketContext";
 
 export default function NewListingsNotification() {
   const { newListings, clearNewListings } = useContext(SocketContext);

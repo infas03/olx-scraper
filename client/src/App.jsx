@@ -2,8 +2,8 @@ import "./App.css";
 import FilterBar from "./components/FilterBar";
 import { ListingContainer } from "./components/ListContainer";
 import NewListingsNotification from "./components/NewListingsNotification";
-import { SocketProvider } from "./context/SocketContext";
 import { ListingsProvider } from "./providers/ListingProvider";
+import { SocketProvider } from "./providers/SocketProvider";
 
 function App() {
   return (
