@@ -2,7 +2,7 @@ import Listing from '../models/Listing.js';
 import { hashString } from '../utils/helper.js';
 import scrapeOLX from '../scraper/olxScraper.js';
 
-const SCRAPE_INTERVAL_MINUTES = 1;
+const SCRAPE_INTERVAL_MINUTES = 10;
 let scrapeInterval = null;
 let isScraping = false;
 let scrapeCount = 0;

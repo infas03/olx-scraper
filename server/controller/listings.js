@@ -2,7 +2,7 @@ import Listing from "../models/Listing.js";
 
 export const getAllListings = async (req, res) => {
   try {
-    const listings = await Listing.findAll({ order: [['timestamp', 'DESC']] });
+    const listings = await Listing.findAll({ order: [['createdAt', 'ASC']] });
     res.json(listings);
   } catch (error) {
     console.error('Error fetching listings:', error);
