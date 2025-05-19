@@ -19,27 +19,23 @@ async function runScrape() {
 
   try {
     console.log(`Starting OLX scrape #${scrapeCount}...`);
-    const listings = await scrapeOLX(1);
-
-    const newListings = [];
-    for (const listing of listings) {
-      const listingId = hashString(listing.link);
-      const exists = await Listing.findOne({ where: { id: listingId } });
-      
-      if (!exists) {
-        newListings.push({
-          id: listingId,
-          ...listing,
-          createdAt: new Date()
-        });
+    
+    await scrapeOLX(3, async (newListings) => {
+      for (const listing of newListings) {
+        const listingId = hashString(listing.link);
+        const exists = await Listing.findOne({ where: { id: listingId } });
+        
+        if (!exists) {
+          await Listing.create({
+            id: listingId,
+            ...listing,
+            createdAt: new Date()
+          });
+        }
       }
-    }
+    });
 
-    if (newListings.length > 0) {
-      await Listing.bulkCreate(newListings);
-    }
-
-    console.log(`Scrape #${scrapeCount} complete. New: ${newListings.length}/${listings.length}`);
+    console.log(`Scrape #${scrapeCount} complete.`);
   } catch (error) {
     console.error(`Scrape #${scrapeCount} failed:`, error);
   } finally {

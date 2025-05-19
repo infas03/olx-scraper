@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 
-const scrapeOLX = async (pageLimit = 3) => {
+const scrapeOLX = async (pageLimit = 3, onPageScraped = null) => {
   console.time("scrapeOLX");
   const browser = await puppeteer.launch({
     headless: "new",
@@ -117,18 +117,20 @@ const scrapeOLX = async (pageLimit = 3) => {
         );
       });
 
-      pageListings.forEach((listing) => {
-        if (
-          listing.title !== "N/A" &&
-          listing.price !== "N/A" &&
-          listing.date !== "N/A" &&
-          !allListings.some((existing) => existing.link === listing.link)
-        ) {
-          allListings.push(listing);
-        }
-      });
+      const newListings = pageListings.filter(listing => 
+        listing.title !== "N/A" && 
+        listing.price !== "N/A" && 
+        listing.date !== "N/A" &&
+        !allListings.some(existing => existing.link === listing.link)
+      );
 
-      console.log(`Page ${currentPage}: ${pageListings.length} listings`);
+      allListings.push(...newListings);
+      
+      if (onPageScraped) {
+        await onPageScraped(newListings);
+      }
+
+      console.log(`Page ${currentPage}: ${newListings.length} listings`);
     }
 
     console.timeEnd("scrapeOLX");
