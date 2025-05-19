@@ -21,7 +21,6 @@ async function runScrape() {
 
   try {
     console.log(`Starting OLX scrape #${scrapeCount}...`);
-    notifyClients('scrape-status', { status: 'started', scrapeCount });
     
     await scrapeOLX(3, async (newListings) => {
       const savedListings = [];
@@ -47,19 +46,8 @@ async function runScrape() {
     });
 
     console.log(`Scrape #${scrapeCount} complete.`);
-    notifyClients('scrape-status', { 
-      status: 'completed', 
-      scrapeCount,
-      newListingsCount,
-      duration: ((Date.now() - startTime) / 1000).toFixed(2) 
-    });
   } catch (error) {
     console.error(`Scrape #${scrapeCount} failed:`, error);
-    notifyClients('scrape-status', { 
-      status: 'failed', 
-      scrapeCount,
-      error: error.message 
-    });
   } finally {
     isScraping = false;
     console.log(`Scrape #${scrapeCount} took ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
@@ -85,7 +73,6 @@ export function stopScheduler() {
   if (scrapeInterval) {
     clearInterval(scrapeInterval);
     scrapeInterval = null;
-    notifyClients('scrape-status', { status: 'stopped' });
     console.log('Scheduler stopped');
   }
 }

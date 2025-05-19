@@ -1,28 +1,30 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { SocketContext } from "../context/SocketContext";
-import { useEffect } from "react";
 import ListingsContext from "../context/ListingContext";
 
 export default function NewListingsNotification() {
   const { newListings, clearNewListings } = useContext(SocketContext);
-  const { refreshListings, setPagination } = useContext(ListingsContext);
+  const { refreshListings, setPagination, setFilter } =
+    useContext(ListingsContext);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(newListings);
   }, [newListings]);
 
-  if (!isVisible) return null;
-
-  const handleUpdateClick = async () => {
+  const handleUpdateClick = useCallback(async () => {
     await clearNewListings();
+    await setFilter("");
     await setPagination({
       page: 1,
       limit: 24,
       total: 0,
     });
-    refreshListings();
-  };
+    await refreshListings();
+    setIsVisible(false);
+  }, [clearNewListings, refreshListings, setPagination, setFilter]);
+
+  if (!isVisible) return null;
 
   return (
     <div

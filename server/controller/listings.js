@@ -1,17 +1,26 @@
 import Listing from "../models/Listing.js";
+import { Op } from "sequelize";
 
 export const getAllListings = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search || "";
 
-    const totalCount = await Listing.count();
+const whereClause = searchQuery ? {
+      [Op.or]: [
+        { title: { [Op.like]: `%${searchQuery}%` }},
+        { location: { [Op.like]: `%${searchQuery}%` }}
+      ]
+    } : {};
+    const totalCount = await Listing.count({ where: whereClause });
 
     const listings = await Listing.findAll({
-      order: [['createdAt', 'DESC']],
+      where: whereClause,
+      order: [["createdAt", "DESC"]],
       limit,
-      offset
+      offset,
     });
 
     res.json({
@@ -23,14 +32,14 @@ export const getAllListings = async (req, res) => {
         currentPage: page,
         pageSize: limit,
         hasNextPage: page * limit < totalCount,
-        hasPreviousPage: page > 1
-      }
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
-    console.error('Error fetching listings:', error);
-    res.status(500).json({ 
+    console.error("Error fetching listings:", error);
+    res.status(500).json({
       success: false,
-      error: 'Failed to fetch listings' 
+      error: "Failed to fetch listings",
     });
   }
 };

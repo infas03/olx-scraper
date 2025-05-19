@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import defaultPic from '../assets/default.svg';
 
-export const ListingCard = ({ listing }) => {
+export const ListingCard = memo(({ listing }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <div className="h-48 bg-gray-200 overflow-hidden">
@@ -28,4 +29,4 @@ export const ListingCard = ({ listing }) => {
       </div>
     </div>
   );
-};
+});
