@@ -3,7 +3,7 @@ import { hashString } from '../utils/helper.js';
 import scrapeOLX from '../scraper/olxScraper.js';
 import { notifyClients } from './websocket.js';
 
-const SCRAPE_INTERVAL_MINUTES = 10;
+const SCRAPE_INTERVAL_MINUTES = 7;
 let scrapeInterval = null;
 let isScraping = false;
 let scrapeCount = 0;

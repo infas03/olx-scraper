@@ -3,7 +3,7 @@ import defaultPic from '../assets/default.svg';
 
 export const ListingCard = memo(({ listing }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow max-w-[400px]">
       <div className="h-48 bg-gray-200 overflow-hidden">
         <img
           src={listing.image !== 'N/A' ? listing.image : defaultPic}
